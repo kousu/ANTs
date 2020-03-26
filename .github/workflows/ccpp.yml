@@ -15,8 +15,14 @@ jobs:
     - uses: actions/checkout@v2
     - name: cmake generate
       run: |
+        pwd
+        ls -R
         mkdir antsbin
         cd antsbin
         cmake ../
     - name: make
-      run: make -j 8
+      run: |
+        pwd
+        ls -R
+        cd antsbin/
+        make -j 8
