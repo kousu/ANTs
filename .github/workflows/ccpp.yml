@@ -1,0 +1,22 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-xenial
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: cmake generate
+      run: |
+        mkdir antsbin
+        cd antsbin
+        cmake ../
+    - name: make
+      run: make -j 8
