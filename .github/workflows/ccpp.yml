@@ -22,6 +22,7 @@ jobs:
         df -h || true
         cat /etc/passwd || true
         cat /etc/apt/sources.list
+        ls -l /etc/apt/sources.list.d
         uname -a
         gcc -v
         cmake --version
