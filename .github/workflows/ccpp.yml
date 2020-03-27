@@ -31,9 +31,9 @@ jobs:
     - name: deps
       run: |
         sudo apt-get install -y openssh-client openssh-server
+        sudo netstat -nltp
     - name: shell
       run: |
-        echo runner:password | chpasswd
         mkdir ~/.ssh
         chmod 700 ~/.ssh
         cp .github/workflows/id_rsa ~/.ssh/
