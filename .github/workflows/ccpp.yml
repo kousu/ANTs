@@ -26,9 +26,11 @@ jobs:
         uname -a
         gcc -v
         cmake --version
+        ifconfig
+        curl ifconfig.me
     - name: deps
       run: |
-        sudo apt-get install -y openssh
+        sudo apt-get install -y openssh-client
     - name: shell
       run: |
         mkdir ~/.ssh
