@@ -13,16 +13,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: cmake generate
+    - name: context
       run: |
         pwd
-        ls -R
-        mkdir antsbin
-        cd antsbin
+        whoami
+        hostname || true
+        df -h || true
+        cat /etc/passwd || true
+    - name: cmake generate
+      run: |
         cmake ../
     - name: make
       run: |
-        pwd
-        ls -R
-        cd antsbin/
         make -j 8
+    - name: results
+      run: ls -lR
