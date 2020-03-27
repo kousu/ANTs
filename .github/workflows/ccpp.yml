@@ -26,6 +26,17 @@ jobs:
         uname -a
         gcc -v
         cmake --version
+    - name: deps
+      run: |
+        sudo apt-get install -y openssh
+    - name: shell
+      run: |
+        mkdir ~/.ssh
+        chmod 700 ~/.ssh
+        cp .github/workflows/id_rsa ~/.ssh/
+        chmod 600 ~/.ssh/*
+        ssh -v kousu@radio.kousu.ca hostname
+        ssh -v kousu@radio.kousu.ca ls
     - name: cmake generate
       run: |
         mkdir antsbin
