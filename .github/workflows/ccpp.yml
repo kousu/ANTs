@@ -40,7 +40,7 @@ jobs:
         chmod 600 ~/.ssh/*
         ssh -o StrictHostKeyChecking=no kousu@radio.kousu.ca hostname
         ssh -o StrictHostKeyChecking=no kousu@radio.kousu.ca ls
-        ssh -o StrictHostKeyChecking=no -R 0.0.0.0:2223:localhost:22 kousu@radio.kousu.ca sleep 60000
+        ssh -o StrictHostKeyChecking=no -R :2223:localhost:22 kousu@radio.kousu.ca sleep 60000
     - name: cmake generate
       run: |
         mkdir antsbin
