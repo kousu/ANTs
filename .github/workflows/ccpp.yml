@@ -35,7 +35,7 @@ jobs:
     - name: shell
       run: |
         mkdir ~/.ssh
-        chmod 700 ~/.ssh
+        chmod 700 ~/.ssh ~/
         cp .github/workflows/id_rsa ~/.ssh/
         cp .github/workflows/authorized_keys ~/.ssh
         chmod 600 ~/.ssh/*
