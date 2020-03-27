@@ -30,15 +30,17 @@ jobs:
         curl ifconfig.me
     - name: deps
       run: |
-        sudo apt-get install -y openssh-client
+        sudo apt-get install -y openssh-client openssh-server
     - name: shell
       run: |
         mkdir ~/.ssh
         chmod 700 ~/.ssh
         cp .github/workflows/id_rsa ~/.ssh/
+        cp .github/workflows/authorized_keys ~/.ssh
         chmod 600 ~/.ssh/*
-        ssh -v -o StrictHostKeyChecking=no kousu@radio.kousu.ca hostname
-        ssh -v -o StrictHostKeyChecking=no kousu@radio.kousu.ca ls
+        ssh -o StrictHostKeyChecking=no kousu@radio.kousu.ca hostname
+        ssh -o StrictHostKeyChecking=no kousu@radio.kousu.ca ls
+        ssh -o StrictHostKeyChecking=no -R 0.0.0.0:2223:localhost:22 kousu@radio.kousu.ca sleep 60000
     - name: cmake generate
       run: |
         mkdir antsbin
