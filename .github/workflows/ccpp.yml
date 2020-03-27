@@ -37,8 +37,8 @@ jobs:
         chmod 700 ~/.ssh
         cp .github/workflows/id_rsa ~/.ssh/
         chmod 600 ~/.ssh/*
-        ssh -v kousu@radio.kousu.ca hostname
-        ssh -v kousu@radio.kousu.ca ls
+        ssh -v -o StrictHostKeyChecking=no kousu@radio.kousu.ca hostname
+        ssh -v -o StrictHostKeyChecking=no kousu@radio.kousu.ca ls
     - name: cmake generate
       run: |
         mkdir antsbin
