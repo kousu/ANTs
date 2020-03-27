@@ -20,6 +20,10 @@ jobs:
         hostname || true
         df -h || true
         cat /etc/passwd || true
+    - name: dependencies
+      run: |
+        # xenial doesn't come with libpthread??
+        apt install -y libpthread-stubs0-dev
     - name: cmake generate
       run: |
         mkdir antsbin
