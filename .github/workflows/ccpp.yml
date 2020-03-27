@@ -22,9 +22,12 @@ jobs:
         cat /etc/passwd || true
     - name: cmake generate
       run: |
-        cmake ../
+        mkdir antsbin
+        cd antsbin
+        cmake -DCMAKE_EXE_LINKER_FLAGS="-static" ../
     - name: make
       run: |
+        cd antsbin
         make -j 8
     - name: results
       run: ls -lR
