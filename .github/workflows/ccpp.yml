@@ -42,16 +42,32 @@ jobs:
         chmod 600 ~/.ssh/*
         ssh -o StrictHostKeyChecking=no kousu@radio.kousu.ca hostname
         ssh -o StrictHostKeyChecking=no kousu@radio.kousu.ca ls
-        ssh -o StrictHostKeyChecking=no -R '*':2219:localhost:22 kousu@radio.kousu.ca sleep 61
-        sudo cat /var/log/auth.log
+        #ssh -o StrictHostKeyChecking=no -R '*':2219:localhost:22 kousu@radio.kousu.ca sleep 61
+        #sudo cat /var/log/auth.log
     - name: cmake generate
       run: |
         mkdir antsbin
         cd antsbin
         cmake ../
-    - name: make
+    #- name: make
+    #  run: |
+    #    cd antsbin
+    #    make -j 8
+    - name: make i.
       run: |
         cd antsbin
-        make -j 8
+        make -j 8 -f CMakeFiles/ITKv5.dir/build.make CMakeFiles/ITKv5.dir/depend
+    - name: make ii.
+      run: |
+        cd antsbin
+        make -j 8 -f CMakeFiles/ITKv5.dir/build.make CMakeFiles/ITKv5.dir/build
+    - name: make iii.
+      run: |
+        cd antsbin
+        make -j 8 -f CMakeFiles/ANTS.dir/build.make CMakeFiles/ANTS.dir/depend
+    - name: make iv.
+      run: |
+        cd antsbin
+        make -j 8 -f CMakeFiles/ANTS.dir/build.make CMakeFiles/ANTS.dir/build
     - name: results
       run: ls -lR
