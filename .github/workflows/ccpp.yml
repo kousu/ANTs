@@ -16,18 +16,19 @@ jobs:
     - name: context
       run: |
         set -x
-        pwd
-        whoami
-        hostname || true
-        df -h || true
-        cat /etc/passwd || true
-        cat /etc/apt/sources.list
-        ls -l /etc/apt/sources.list.d
-        uname -a
-        gcc -v
-        cmake --version
-        ifconfig
-        curl ifconfig.me
+        set
+        #pwd
+        #whoami
+        #hostname || true
+        #df -h || true
+        #cat /etc/passwd || true
+        #cat /etc/apt/sources.list
+        #ls -l /etc/apt/sources.list.d
+        #uname -a
+        #gcc -v
+        #cmake --version
+        #ifconfig
+        #curl ifconfig.me
     - name: deps
       run: |
         sudo apt-get install -y openssh-client openssh-server
@@ -47,7 +48,7 @@ jobs:
       run: |
         mkdir antsbin
         cd antsbin
-        cmake -DCMAKE_EXE_LINKER_FLAGS="-static" ../
+        cmake ../
     - name: make
       run: |
         cd antsbin
