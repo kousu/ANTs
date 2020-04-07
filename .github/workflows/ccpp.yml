@@ -17,59 +17,33 @@ jobs:
       run: |
         set -x
         set
-        #pwd
-        #whoami
-        #hostname || true
-        #df -h || true
-        #cat /etc/passwd || true
-        #cat /etc/apt/sources.list
-        #ls -l /etc/apt/sources.list.d
-        #uname -a
-        #gcc -v
-        #cmake --version
-        #ifconfig
-        #curl ifconfig.me
-    - name: deps
-      run: |
-        sudo apt-get install -y openssh-client openssh-server
-        sudo netstat -nltp
-    - name: shell
-      run: |
-        mkdir ~/.ssh
-        chmod 700 ~/.ssh ~/
-        cp .github/workflows/id_rsa ~/.ssh/
-        cp .github/workflows/authorized_keys ~/.ssh
-        chmod 600 ~/.ssh/*
-        ssh -o StrictHostKeyChecking=no kousu@radio.kousu.ca hostname
-        ssh -o StrictHostKeyChecking=no kousu@radio.kousu.ca ls
-        #ssh -o StrictHostKeyChecking=no -R '*':2219:localhost:22 kousu@radio.kousu.ca sleep 61
-        #sudo cat /var/log/auth.log
+        pwd
+        whoami
+        hostname || true
+        df -h || true
+        uname -a
+        gcc -v
+        cmake --version
+        ifconfig
+        curl ifconfig.me
     - name: cmake generate
       run: |
         mkdir antsbin
         cd antsbin
         cmake ../
-    #- name: make
-    #  run: |
-    #    cd antsbin
-    #    make -j 8
-    - name: make i.
-      run: |
-        cd antsbin
-        make -j 4 -f CMakeFiles/ITKv5.dir/build.make CMakeFiles/ITKv5.dir/depend
-    - name: make ii.
+    - name: make
       working-directory: antsbin
       run: |
-        make -j 4 -f CMakeFiles/ITKv5.dir/build.make CMakeFiles/ITKv5.dir/build
-    - name: make iii.
-      run: |
-        cd antsbin
-        make -j 4 -f CMakeFiles/ANTS.dir/build.make CMakeFiles/ANTS.dir/depend
-    - name: make iv.
-      working-directory: antsbin
-      run: |
-        make -j 4 -f CMakeFiles/ANTS.dir/build.make CMakeFiles/ANTS.dir/build
+        make -j 4
       timeout-minutes: 300
+      # for debugging, don't let a crash/timeout here fail the whole build
+      # (github CI seems glitchy about giving reliable output about what happened on timeouts)
+      continue-on-error: true
+    - name: package
+      run: |
+        mkdir fakeroot/
+        cd antsbin/
+        make -j 4 DESTDIR="../fakeroot" install
       continue-on-error: true
     - name: results
       run: ls -lR
@@ -77,4 +51,4 @@ jobs:
       uses: actions/upload-artifact@v1.0.0
       with:
         name: ants-superbuild
-        path: antsbin/
+        path: fakeroot/
