@@ -30,7 +30,18 @@ jobs:
       run: |
         mkdir antsbin
         cd antsbin
-        cmake ../
+        cmake \
+          -DBUILD_SHARED_LIBS=OFF \
+          -DBUILD_TESTING=OFF \
+          -DANTS_USE_QT=OFF \
+          -DANTS_INSTALL_DEVELOPMENT=OFF \
+          -DCOPY_SCRIPT_FILES_TO_BIN_DIR=OFF \
+          -DANTS_BUILD_DISTRIBUTE=ON \
+          -DBUILD_ALL_ANTS_APPS=ON \
+          -DRUN_LONG_TESTS=OFF \
+          -DRUN_SHORT_TESTS=OFF \
+          -DUSE_VTK=OFF \
+          ../
     - name: make
       working-directory: antsbin
       run: |
@@ -46,7 +57,8 @@ jobs:
         make VERBOSE=1 -j 4 DESTDIR="../fakeroot" install
       continue-on-error: true
     - name: results
-      run: ls -lR
+      working-directory: antsbin
+      run: find .
     - name: Upload result
       uses: actions/upload-artifact@v1.0.0
       with:
