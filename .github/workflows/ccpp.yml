@@ -42,14 +42,14 @@ jobs:
     - name: package
       run: |
         mkdir fakeroot/
-        cd antsbin/
-        make VERBOSE=1 -j 4 DESTDIR="../fakeroot" install
+        cd antsbin/ANTS-build
+        make VERBOSE=1 -j 4 DESTDIR="../../fakeroot" install
       continue-on-error: true
-    - name: results
-      run: ls -lR
+    - name: results (DEBUG)
+      run: find .
     - name: Upload result
       uses: actions/upload-artifact@v1.0.0
       with:
         name: ants-superbuild
         #path: fakeroot/ # TODO, once I figure out why make install doesn't work
-        path: antsbin/ANTS-build
+        path: fakeroot/
