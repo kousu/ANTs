@@ -51,12 +51,13 @@ jobs:
         mkdir sct-apps/
         cp antsbin/ANTS-build/Examples/{antsRegistration,antsSliceRegularizedRegistration,antsApplyTransforms,ComposeMultiTransform} sct-apps
         (cd sct-apps; for i in `ls`; do mv $i isct_$i; done)
+        tar -zcvf sct-apps.tar.gz sct-apps/
       continue-on-error: true
     - name: results (DEBUG)
       run: find .
     - name: Upload result
-      uses: actions/upload-artifact@v1.0.0
+      uses: actions/upload-artifact@v2-preview
       with:
         name: ants-superbuild
         #path: fakeroot/ # this is 2.3G large in this build
-        path: sct-apps/
+        path: sct-apps.tar.gz
