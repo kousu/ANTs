@@ -39,17 +39,24 @@ jobs:
       # for debugging, don't let a crash/timeout here fail the whole build
       # (github CI seems glitchy about giving reliable output about what happened on timeouts)
       continue-on-error: true
-    - name: package
+    - name: pre-package
       run: |
         mkdir fakeroot/
         cd antsbin/ANTS-build
         make VERBOSE=1 -j 4 DESTDIR="../../fakeroot" install
       continue-on-error: true
+    - name: package
+      run: |
+        # snip out the apps we need for https://github.com/neuropoly/spinalcordtoolbox, since including all of ANTS is too much
+        mkdir sct-apps/
+        cp antsbin/ANTS-build/Examples/{antsRegistration,antsSliceRegularizedRegistration,antsApplyTransforms,ComposeMultiTransform} sct-apps
+        (cd sct-apps; for i in `ls`; do mv $i isct_$i; done)
+        continue-on-error: true
     - name: results (DEBUG)
       run: find .
     - name: Upload result
       uses: actions/upload-artifact@v1.0.0
       with:
         name: ants-superbuild
-        #path: fakeroot/ # TODO, once I figure out why make install doesn't work
-        path: fakeroot/
+        #path: fakeroot/ # this is 2.3G large in this build
+        path: sct-apps/
