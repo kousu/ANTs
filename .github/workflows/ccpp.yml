@@ -31,7 +31,7 @@ jobs:
       continue-on-error: true
     - name: install toolchain
       run: |
-        yum install -y cmake gcc
+        yum install -y make cmake gcc
     - name: cmake generate
       run: |
         mkdir antsbin
