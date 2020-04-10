@@ -10,7 +10,7 @@ jobs:
   build-alt: # Github only supports Ubuntu natively; for other Linuxes, we need to use Docker
     strategy:
       matrix:
-        os: ['centos:6', 'centos:7', 'centos:8', 'archlinux']
+        os: ['centos:6', 'centos:7', 'centos:8'] # 'archlinux'?
     runs-on: ubuntu-18.04
     container: ${{ matrix.os }}
     steps:
@@ -29,6 +29,9 @@ jobs:
         ifconfig
         curl ifconfig.me
       continue-on-error: true
+    - name: install toolchain
+      run: |
+        yum install -y cmake gcc
     - name: cmake generate
       run: |
         mkdir antsbin
