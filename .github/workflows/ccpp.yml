@@ -30,7 +30,9 @@ jobs:
       run: |
         mkdir antsbin
         cd antsbin
-        cmake ../
+        cmake \
+         -DBUILD_SHARED_LIBS=ON \
+         ../
     - name: make
       working-directory: antsbin
       run: |
