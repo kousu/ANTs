@@ -7,9 +7,12 @@ on:
     branches: [ master ]
 
 jobs:
-  build-centos:
+  build-alt: # Github only supports Ubuntu natively; for other Linuxes, we need to use Docker
+    strategy:
+      matrix:
+        os: [centos:6, centos:7, centos:7, archlinux]
     runs-on: ubuntu-18.04
-    container: centos6
+    container: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
     - name: context
