@@ -6,62 +6,69 @@ on:
   pull_request:
     branches: [ master ]
 
-build-ants: &build-ants
-  - uses: actions/checkout@v1
-  - name: context
-    run: |
-      set -x
-      set
-      pwd
-      whoami
-      hostname || true
-      df -h || true
-      uname -a
-      gcc -v
-      cmake --version
-      ifconfig
-      curl ifconfig.me
-    continue-on-error: true
-  - name: cmake generate
-    run: |
-      mkdir antsbin
-      cd antsbin
-      cmake \
-       -DBUILD_SHARED_LIBS=ON \
-       ../
-  - name: make
-    working-directory: antsbin
-    run: |
-      make VERBOSE=1 -j 4
-    timeout-minutes: 300
-    # for debugging, don't let a crash/timeout here fail the whole build
-    # (github CI seems glitchy about giving reliable output about what happened on timeouts)
-    continue-on-error: true
-  - name: pre-package
-    run: |
-      mkdir fakeroot/
-      cd antsbin/ANTS-build
-      make VERBOSE=1 -j 4 DESTDIR="../../fakeroot" install
-    continue-on-error: true
-  - name: package
-    run: |
-      # snip out the apps we need for https://github.com/neuropoly/spinalcordtoolbox, since including all of ANTS is too much
-      mkdir sct-apps/
-      cp antsbin/ANTS-build/Examples/{antsRegistration,antsSliceRegularizedRegistration,antsApplyTransforms,ComposeMultiTransform} sct-apps
-      (cd sct-apps; for i in `ls`; do mv $i isct_$i; done)
-      tar -zcvf sct-apps.tar.gz sct-apps/
-    continue-on-error: true
-  - name: results (DEBUG)
-    run: find .
-  - name: Upload result
-    uses: actions/upload-artifact@v2-preview
-    with:
-      name: ants-superbuild
-      #path: fakeroot/ # this is 2.3G large in this build
-      path: sct-apps.tar.gz
-
-
 jobs:
+  build-alt: # Github only supports Ubuntu natively; for other Linuxes, we need to use Docker
+    strategy:
+      matrix:
+        os: ['centos:6', 'centos:7', 'centos:8'] # 'archlinux'?
+    runs-on: ubuntu-latest
+    container: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v1
+    - name: context
+      run: |
+        set -x
+        set
+        pwd
+        whoami
+        hostname || true
+        df -h || true
+        uname -a
+        gcc -v
+        cmake --version
+        ifconfig
+        curl ifconfig.me
+      continue-on-error: true
+    - name: install toolchain
+      run: |
+        yum install -y make cmake gcc gcc-c++ git zlib-devel
+    - name: cmake generate
+      run: |
+        mkdir antsbin
+        cd antsbin
+        cmake \
+         -DBUILD_SHARED_LIBS=ON \
+         ../
+    - name: make
+      working-directory: antsbin
+      run: |
+        make VERBOSE=1 -j 4
+      timeout-minutes: 300
+      # for debugging, don't let a crash/timeout here fail the whole build
+      # (github CI seems glitchy about giving reliable output about what happened on timeouts)
+      continue-on-error: true
+    - name: pre-package
+      run: |
+        mkdir fakeroot/
+        cd antsbin/ANTS-build
+        make VERBOSE=1 -j 4 DESTDIR="../../fakeroot" install
+      continue-on-error: true
+    - name: package
+      run: |
+        # snip out the apps we need for https://github.com/neuropoly/spinalcordtoolbox, since including all of ANTS is too much
+        mkdir sct-apps/
+        cp antsbin/ANTS-build/Examples/{antsRegistration,antsSliceRegularizedRegistration,antsApplyTransforms,ComposeMultiTransform} sct-apps
+        (cd sct-apps; for i in `ls`; do mv $i isct_$i; done)
+        tar -zcvf sct-apps.tar.gz sct-apps/
+      continue-on-error: true
+    - name: results (DEBUG)
+      run: find .
+    - name: Upload result
+      uses: actions/upload-artifact@v2-preview
+      with:
+        name: ants-superbuild
+        #path: fakeroot/ # this is 2.3G large in this build
+        path: sct-apps.tar.gz
 
   build:
     strategy:
@@ -69,17 +76,55 @@ jobs:
         os: [ubuntu-16.04, ubuntu-18.04, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      <<: *build-ants
-
-  # Github only supports Ubuntu natively; for other Linuxes, we need to use Docker
-  build-manylinuxes:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os: ['centos:8'] # 'archlinux'?
-    container: ${{ matrix.os }}
-    steps:
-      - name: install toolchain
-        run: |
-          yum install -y make cmake gcc gcc-c++ git zlib-devel
-      <<: *build-ants
+    - uses: actions/checkout@v2
+    - name: context
+      run: |
+        set -x
+        set
+        pwd
+        whoami
+        hostname || true
+        df -h || true
+        uname -a
+        gcc -v
+        cmake --version
+        ifconfig
+        curl ifconfig.me
+      continue-on-error: true
+    - name: cmake generate
+      run: |
+        mkdir antsbin
+        cd antsbin
+        cmake \
+         -DBUILD_SHARED_LIBS=ON \
+         ../
+    - name: make
+      working-directory: antsbin
+      run: |
+        make VERBOSE=1 -j 4
+      timeout-minutes: 300
+      # for debugging, don't let a crash/timeout here fail the whole build
+      # (github CI seems glitchy about giving reliable output about what happened on timeouts)
+      continue-on-error: true
+    - name: pre-package
+      run: |
+        mkdir fakeroot/
+        cd antsbin/ANTS-build
+        make VERBOSE=1 -j 4 DESTDIR="../../fakeroot" install
+      continue-on-error: true
+    - name: package
+      run: |
+        # snip out the apps we need for https://github.com/neuropoly/spinalcordtoolbox, since including all of ANTS is too much
+        mkdir sct-apps/
+        cp antsbin/ANTS-build/Examples/{antsRegistration,antsSliceRegularizedRegistration,antsApplyTransforms,ComposeMultiTransform} sct-apps
+        (cd sct-apps; for i in `ls`; do mv $i isct_$i; done)
+        tar -zcvf sct-apps.tar.gz sct-apps/
+      continue-on-error: true
+    - name: results (DEBUG)
+      run: find .
+    - name: Upload result
+      uses: actions/upload-artifact@v2-preview
+      with:
+        name: ants-superbuild
+        #path: fakeroot/ # this is 2.3G large in this build
+        path: sct-apps.tar.gz
