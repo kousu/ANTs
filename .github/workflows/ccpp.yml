@@ -10,7 +10,7 @@ jobs:
   build-alt: # Github only supports Ubuntu natively; for other Linuxes, we need to use Docker
     strategy:
       matrix:
-        os: ['centos:8', 'archlinux']
+        os: ['centos', 'archlinux']
     runs-on: ubuntu-latest
     container: ${{ matrix.os }}
     steps:
@@ -34,6 +34,10 @@ jobs:
     - name: Upload result
       uses: actions/upload-artifact@v2-preview
       with:
+        # there's a lurking bug here: Artifacts can't have ':' in their names,
+        # but docker images are named with colons in their names to specify specific versions
+        # so if we want to maintain an old "centos:7", say, we're stuck.
+        # it's okay for now though.
         name: ants-superbuild_${{ matrix.os }}
         #path: fakeroot/ # this is 2.3G large in this build
         path: sct-apps.tar.gz
