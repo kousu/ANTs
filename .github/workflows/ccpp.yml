@@ -70,7 +70,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.sha }} # TODO: use .ref, which is the current branch or tag; but then we cannot rerun the build.
+          tag_name: binaries-${{ github.sha }} # TODO: use .ref, which is the current branch or tag; but then we cannot rerun the build.
           release_name: Release ${{ github.sha }}
           draft: false
           prerelease: false
