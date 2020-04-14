@@ -79,7 +79,7 @@ jobs:
         os: ['centos:8'] # 'archlinux'?
     container: ${{ matrix.os }}
     steps:
-      <<: *build-ants
       - name: install toolchain
         run: |
           yum install -y make cmake gcc gcc-c++ git zlib-devel
+      <<: *build-ants
