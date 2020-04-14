@@ -56,8 +56,8 @@ jobs:
         path: sct-apps_${{ matrix.os }}.tar.gz
   
   release:
-    #needs: [build-manylinuxes, build]
-    needs: [build]
+    needs: [build-manylinuxes, build]
+    #needs: [build]
     runs-on: ubuntu-latest
     steps:
       - name: debug
