@@ -55,7 +55,7 @@ jobs:
         path: sct-apps_${{ matrix.os }}.tar.gz
   
   release:
-    needs: [build-alt, build]
+    needs: [build-alt]
     runs-on: ubuntu-latest
     steps:
       - name: Create Release
@@ -71,10 +71,12 @@ jobs:
       - uses: actions/download-artifact@v1
         with:
           name: ants-superbuild_centos
+      - name: checkin
+        run: find .
       # github (currently) always zips uploaded files
       # https://github.com/actions/upload-artifact/issues/38
       - name: unzip artifacts
-        run: unzip ants-superbuild_centos.zip
+        run: unzip ants-superbuild_centos
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
@@ -91,7 +93,7 @@ jobs:
       # github (currently) always zips uploaded files
       # https://github.com/actions/upload-artifact/issues/38
       - name: unzip artifacts
-        run: unzip ants-superbuild_archlinux.zip
+        run: unzip ants-superbuild_archlinux
 
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
