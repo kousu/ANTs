@@ -10,8 +10,8 @@ jobs:
   build-alt: # Github only supports Ubuntu natively; for other Linuxes, we need to use Docker
     strategy:
       matrix:
-        os: ['centos:8'] # 'archlinux'?
-    runs-on: ubuntu-18.04
+        os: ['centos:6', 'centos:7', 'centos:8'] # 'archlinux'?
+    runs-on: ubuntu-latest
     container: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
