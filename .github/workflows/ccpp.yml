@@ -15,11 +15,11 @@ jobs:
     container: ${{ matrix.os }}
     steps:
     - name: install toolchain
-      if: contains(os.matrix, 'centos')
+      if: contains(matrix.os, 'centos')
       run: |
         yum install -y make cmake gcc gcc-c++ git zlib-devel
     - name: install toolchain
-      if: contains(os.matrix, 'archlinux')
+      if: contains(matrix.os, 'archlinux')
       run: |
         pacman -Syy --noconfirm gcc cmake git
     - uses: actions/checkout@v1
