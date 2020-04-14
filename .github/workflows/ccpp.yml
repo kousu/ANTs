@@ -7,33 +7,6 @@ on:
     branches: [ master ]
 
 jobs:
-  build-manylinuxes: # Github only supports Ubuntu natively; for other Linuxes, we need to use Docker
-    strategy:
-      matrix:
-        os: ['centos', 'archlinux']
-    runs-on: ubuntu-latest
-    container: ${{ matrix.os }}
-    steps:
-    - name: package
-      run: |
-        mkdir sct-apps
-        uname -a > sct-apps/platform.txt
-        set -x # DEBUG
-        tar -zcvf sct-apps_${{ matrix.os }}.tar.gz sct-apps/
-      continue-on-error: true
-    - name: results (DEBUG)
-      run: find .
-    - name: Upload result
-      uses: actions/upload-artifact@v2-preview
-      with:
-        # there's a lurking bug here: Artifacts can't have ':' in their names,
-        # but docker images are named with colons in their names to specify specific versions
-        # so if we want to maintain an old "centos:7", say, we're stuck.
-        # it's okay for now though.
-        name: ants-superbuild_${{ matrix.os }}
-        #path: fakeroot/ # this is 2.3G large in this build
-        path: sct-apps_${{ matrix.os }}.tar.gz
-
   build:
     strategy:
       matrix:
@@ -54,26 +27,44 @@ jobs:
         name: ants-superbuild_${{ matrix.os }}
         #path: fakeroot/ # this is 2.3G large in this build
         path: sct-apps_${{ matrix.os }}.tar.gz
-  
-  release:
-    needs: [build-manylinuxes, build]
-    #needs: [build]
+
+  build-manylinuxes: # Github only supports Ubuntu natively; for other Linuxes, we need to use Docker
+    strategy:
+      matrix:
+        os: ['centos', 'archlinux']
     runs-on: ubuntu-latest
+    container: ${{ matrix.os }}
     steps:
-      - name: debug
-        run: |
-          echo ${{ github.ref }}
-          echo ${{ github.sha }}
-          echo ${{ toJSON(env) }}
-          echo ${{ github.GITHUB_RUN_ID }}
-          echo ${{ env.GITHUB_RUN_ID }}
-          
+    - name: package
+      run: |
+        mkdir sct-apps
+        uname -a > sct-apps/platform.txt
+        set -x # DEBUG
+        tar -zcvf sct-apps_${{ matrix.os }}.tar.gz sct-apps/
+      continue-on-error: true
+    - name: Upload result
+      uses: actions/upload-artifact@v2-preview
+      with:
+        # there's a lurking bug here: Artifacts can't have ':' in their names,
+        # but docker images are named with colons in their names to specify specific versions
+        # so if we want to maintain an old "centos:7", say, we're stuck.
+        # it's okay for now though.
+        name: ants-superbuild_${{ matrix.os }}
+        #path: fakeroot/ # this is 2.3G large in this build
+        path: sct-apps_${{ matrix.os }}.tar.gz
+        
+  release:
+    needs: [build, build-manylinuxes]
+    runs-on: ubuntu-latest
+    steps:          
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          # name the release with the run_id to allow multiple builds on the same branch/tag
+          # https://github.com/actions/create-release/issues/2#issuecomment-613591846
           tag_name: ${{ github.ref }}-${{github.run_id }}
           release_name: Release ${{ github.sha }}
           draft: true
