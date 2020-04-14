@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build-alt: # Github only supports Ubuntu natively; for other Linuxes, we need to use Docker
+  build-manylinuxes: # Github only supports Ubuntu natively; for other Linuxes, we need to use Docker
     strategy:
       matrix:
         os: ['centos', 'archlinux']
@@ -55,7 +55,7 @@ jobs:
         path: sct-apps_${{ matrix.os }}.tar.gz
   
   release:
-    needs: [build-alt]
+    needs: [build-manylinuxes, build]
     runs-on: ubuntu-latest
     steps:
       - name: Create Release
@@ -64,43 +64,84 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ github.sha }} # TODO: use .ref, which is the current branch or tag; but then we cannot rerun the build.
+          release_name: Release ${{ github.sha }}
           draft: false
           prerelease: false
+
       - uses: actions/download-artifact@v1
         with:
           name: ants-superbuild_centos
-      - name: checkin
+        continue-on-error: true
+      - name: checkin # DEBUG
         run: find .
-      # github (currently) always zips uploaded files
-      # https://github.com/actions/upload-artifact/issues/38
-      - name: unzip artifacts
-        run: unzip ants-superbuild_centos
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./sct-apps_centos.tar.gz
+          asset_path: ./ants-superbuild_centos/sct-apps_centos.tar.gz
           asset_name: sct-apps_centos.tar.gz
           asset_content_type: application/gzip
-        
+        continue-on-error: true
+ 
       - uses: actions/download-artifact@v1
         with:
           name: ants-superbuild_archlinux
-      # github (currently) always zips uploaded files
-      # https://github.com/actions/upload-artifact/issues/38
-      - name: unzip artifacts
-        run: unzip ants-superbuild_archlinux
-
+        continue-on-error: true
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./sct-apps_archlinux.tar.gz
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./ants-superbuild_archlinux/sct-apps_archlinux.tar.gz
           asset_name: sct-apps_archlinux.tar.gz
           asset_content_type: application/gzip
+        continue-on-error: true
+
+      - uses: actions/download-artifact@v1
+        with:
+          name: ants-superbuild_ubuntu-16.04
+        continue-on-error: true
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./ants-superbuild_ubuntu-16.04/sct-apps_ubuntu-16.04.tar.gz
+          asset_name: sct-apps_ubuntu-16.04.tar.gz
+          asset_content_type: application/gzip
+        continue-on-error: true
+
+      - uses: actions/download-artifact@v1
+        with:
+          name: ants-superbuild_ubuntu-18.04
+        continue-on-error: true
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./ants-superbuild_ubuntu-18.04/sct-apps_ubuntu-18.04.tar.gz
+          asset_name: sct-apps_ubuntu-18.04.tar.gz
+          asset_content_type: application/gzip
+        continue-on-error: true
+
+      - uses: actions/download-artifact@v1
+        with:
+          name: ants-superbuild_macos-latest
+        continue-on-error: true
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./ants-superbuild_macos-latest/sct-apps_macos-latest.tar.gz
+          asset_name: sct-apps_macos-latest.tar.gz
+          asset_content_type: application/gzip
+        continue-on-error: true
