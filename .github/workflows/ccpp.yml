@@ -64,6 +64,10 @@ jobs:
         run: |
           echo ${{ github.ref }}
           echo ${{ github.sha }}
+          echo ${{ toJSON(env) }}
+          echo ${{ github.GITHUB_RUN_ID }}
+          echo ${{ env.GITHUB_RUN_ID }}
+          
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
