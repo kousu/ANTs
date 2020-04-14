@@ -21,7 +21,7 @@ jobs:
     - name: install toolchain
       if: contains(matrix.os, 'archlinux')
       run: |
-        pacman -Syy --noconfirm make cmake gcc git
+        pacman -Syy --noconfirm make cmake gcc git libffi
     - uses: actions/checkout@v1
     - name: context
       run: |
